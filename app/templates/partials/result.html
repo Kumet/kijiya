@@ -1,0 +1,31 @@
+<div class="result-card">
+  <h2>{{ article.title }}</h2>
+
+  {% if article.tags %}
+  <ul class="tags">
+    {% for tag in article.tags %}
+    <li>{{ tag }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <p class="meta">
+    元記事: <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.title or source.url }}</a>
+    ・ 抽出文字数: {{ source.text|length }}字
+    {% if source.truncated %}・ 元記事が長いため前半のみ使用{% endif %}
+  </p>
+
+  <iframe class="preview-frame"
+          src="/preview/{{ doc_id }}"
+          sandbox
+          title="生成記事のプレビュー"
+          height="720"
+          loading="lazy"></iframe>
+
+  <div class="result-actions">
+    <a class="button-primary" href="/download/{{ doc_id }}" download>HTMLをダウンロード</a>
+    <button type="button" class="button-secondary" onclick="document.getElementById('prompt').focus()">
+      別の指示でやり直す
+    </button>
+  </div>
+</div>
