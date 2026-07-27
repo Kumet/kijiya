@@ -71,7 +71,7 @@ ruff
 
 ```
 [ブラウザ]
-   │ 1. POST /api/generate  (hx-post, form: url, prompt, tone, length)
+   │ 1. POST /api/generate  (hx-post, form: url, prompt)
    ▼
 [FastAPI: routers/generate.py]
    │ 2. fetcher.fetch()      URL検証(SSRF対策) → HTML取得
@@ -170,8 +170,6 @@ kijiya/
 class GenerateRequest(BaseModel):
     url: HttpUrl
     prompt: str = Field(min_length=1, max_length=2000)
-    tone: Literal["neutral", "casual", "formal", "explainer"] = "neutral"
-    length: Literal["short", "medium", "long"] = "medium"
 
 class SourceArticle(BaseModel):
     url: str
@@ -200,7 +198,7 @@ class StoredDoc(BaseModel):
     created_at: float
 ```
 
-**length の目安 (プロンプトに埋め込む)**: short=600〜900字 / medium=1200〜1800字 / long=2500〜3500字。
+トーン・分量は構造化フィールドを設けず、ユーザーが `prompt` 内で自由記述する。
 
 ---
 
@@ -214,7 +212,7 @@ class StoredDoc(BaseModel):
 
 ### `POST /api/generate`
 - Content-Type: `application/x-www-form-urlencoded`
-- フォーム項目: `url`, `prompt`, `tone`, `length`
+- フォーム項目: `url`, `prompt`
 - レスポンス: **HTMLフラグメント** (`partials/result.html`)。ステータスは常に200を返し、
   失敗時は `partials/error.html` をレンダリングする (htmxの既定では非2xxは差し替えられないため)。
 - 成功時フラグメントに含めるもの:
@@ -371,12 +369,9 @@ truncated: {{ truncated }}
 <instruction>
 {{ prompt }}
 </instruction>
-
-<style>
-トーン: {{ tone_label }}
-分量の目安: {{ length_label }}
-</style>
 ```
+
+トーンや分量の希望はユーザーが `<instruction>` (prompt) 内に自由記述する想定。
 
 ---
 
@@ -402,23 +397,24 @@ truncated: {{ truncated }}
 
 ### 10.1 `index.html` の構造
 
-- ヘッダー: プロダクト名 `記事屋` と一行説明「記事のURLと指示から、新しい記事を組み直す。」
+- ヘッダー: プロダクト名 `url to article` と一行説明「記事のURLと指示から、新しい記事を組み直す。」
 - 入力フォーム (`<form>`, htmx属性):
   ```html
   <form hx-post="/api/generate"
         hx-target="#result"
         hx-swap="innerHTML"
         hx-indicator="#indicator"
-        hx-disabled-elt="find button, find input, find select">
+        hx-disabled-elt="find button, find input, find textarea">
   ```
   - `url` (type=url, required, placeholder="https://...")
   - `prompt` (textarea, required, rows=4,
-     placeholder="例: 高校生にもわかるように、専門用語を噛み砕いて解説記事にして")
-  - `tone` (select: そのまま / くだけた / かたい / 解説調)
-  - `length` (radio: 短め / ふつう / 長め)
+     placeholder="例: 高校生にもわかるように、専門用語を噛み砕いて解説記事にして。トーンや分量の希望もここに書いてください。")
+  - トーン・分量の個別入力は設けない。ユーザーが `prompt` 内で自由記述する。
   - 送信ボタン: ラベルは **「記事を組む」**
 - `#indicator`: 生成中の表示。`.htmx-indicator` クラスで制御。
-  文言は「記事を組んでいます… (30秒ほどかかります)」
+  文言は「記事を組んでいます… (30秒ほどかかります)」。CSS側は
+  `.htmx-request.htmx-indicator` (indicator自身が対象の場合) と
+  `.htmx-request .htmx-indicator` (子孫の場合) の両方を用意すること。
 - `#result`: 結果差し込み先。初期状態は空ではなく、使い方を1行で示す空状態を置く。
 
 ### 10.2 `partials/result.html`
