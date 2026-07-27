@@ -18,9 +18,7 @@ SOURCE = SourceArticle(
     text="本文" * 100,
     truncated=False,
 )
-REQUEST = GenerateRequest(
-    url="https://example.com/a", prompt="要約して", tone="neutral", length="short"
-)
+REQUEST = GenerateRequest(url="https://example.com/a", prompt="要約して")
 
 VALID_JSON_BODY = (
     '{"title": "新タイトル", "lede": "リード文",'

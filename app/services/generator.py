@@ -11,19 +11,6 @@ from app.models import GeneratedArticle, GenerateRequest, SourceArticle
 
 _PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "article.md"
 
-TONE_LABELS = {
-    "neutral": "そのまま",
-    "casual": "くだけた",
-    "formal": "かたい",
-    "explainer": "解説調",
-}
-
-LENGTH_LABELS = {
-    "short": "短め (600〜900字)",
-    "medium": "ふつう (1200〜1800字)",
-    "long": "長め (2500〜3500字)",
-}
-
 _RETRY_INSTRUCTION = (
     "\n\n<instruction>\nJSONのみで再出力せよ。前置きや説明は一切書かない。\n</instruction>"
 )
@@ -42,11 +29,7 @@ _USER_MESSAGE_TEMPLATE = Template(
     "</source_text>\n\n"
     "<instruction>\n"
     "{{ prompt }}\n"
-    "</instruction>\n\n"
-    "<style>\n"
-    "トーン: {{ tone_label }}\n"
-    "分量の目安: {{ length_label }}\n"
-    "</style>\n"
+    "</instruction>\n"
 )
 
 
@@ -64,8 +47,6 @@ def _build_user_message(source: SourceArticle, req: GenerateRequest) -> str:
         truncated=source.truncated,
         text=source.text,
         prompt=req.prompt,
-        tone_label=TONE_LABELS[req.tone],
-        length_label=LENGTH_LABELS[req.length],
     )
 
 

@@ -57,14 +57,12 @@ async def generate_article(
     request: Request,
     url: str = Form(...),
     prompt: str = Form(...),
-    tone: str = Form("neutral"),
-    length: str = Form("medium"),
 ):
     client_ip = request.client.host if request.client else "unknown"
 
     try:
         await rate_limiter.check(client_ip)
-        req = GenerateRequest(url=url, prompt=prompt, tone=tone, length=length)
+        req = GenerateRequest(url=url, prompt=prompt)
 
         final_url, html = await fetcher.fetch(str(req.url))
         source = extractor.extract(html, final_url)
