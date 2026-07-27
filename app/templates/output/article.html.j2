@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ article.title }}</title>
+<meta name="description" content="{{ article.lede }}">
+<style>
+:root {
+  --paper: #F7F6F3;
+  --paper-raised: #FFFFFF;
+  --ink: #1A1E29;
+  --ink-mute: #5C6273;
+  --rule: #DCD9D2;
+  --vermilion: #C8341F;
+  --vermilion-soft: #F3E2DE;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 17px;
+  line-height: 1.9;
+}
+main {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+header h1 {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+.lede {
+  color: var(--ink-mute);
+}
+.tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 1rem 0;
+}
+.tags li {
+  background: var(--vermilion-soft);
+  color: var(--vermilion);
+  border-radius: 4px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.85em;
+}
+article section h2 {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+aside {
+  border-top: 1px solid var(--rule);
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+footer {
+  border-top: 1px solid var(--rule);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  color: var(--ink-mute);
+  font-size: 0.9em;
+}
+footer a {
+  color: var(--vermilion);
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: var(--vermilion-soft);
+  padding: 0 0.25em;
+  border-radius: 3px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1A1E29;
+    --paper-raised: #262B38;
+    --ink: #F0EFEC;
+    --ink-mute: #A6ACBD;
+    --rule: #3A4051;
+    --vermilion: #E15A44;
+    --vermilion-soft: #4A2A26;
+  }
+}
+@media print {
+  article a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--ink-mute);
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>{{ article.title }}</h1>
+    <p class="lede">{{ article.lede }}</p>
+    {% if article.tags %}
+    <ul class="tags">
+      {% for tag in article.tags %}
+      <li>{{ tag }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </header>
+
+  <article>
+    {% for section in article.sections %}
+    <section>
+      <h2>{{ section.heading }}</h2>
+      {% for paragraph in section.paragraphs %}
+      <p>{{ paragraph|inline_md }}</p>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </article>
+
+  {% if article.takeaways %}
+  <aside>
+    <h2>要点</h2>
+    <ul>
+      {% for item in article.takeaways %}
+      <li>{{ item|inline_md }}</li>
+      {% endfor %}
+    </ul>
+  </aside>
+  {% endif %}
+
+  <footer>
+    <p>出典: <a href="{{ source.url }}">{{ source.title or source.url }}</a></p>
+    <p>生成日時: {{ generated_at }}</p>
+    <p>この記事はAIが元記事をもとに再構成したものです。</p>
+  </footer>
+</main>
+</body>
+</html>
