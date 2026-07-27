@@ -1,13 +1,9 @@
-from typing import Literal
-
 from pydantic import BaseModel, Field, HttpUrl
 
 
 class GenerateRequest(BaseModel):
     url: HttpUrl
     prompt: str = Field(min_length=1, max_length=2000)
-    tone: Literal["neutral", "casual", "formal", "explainer"] = "neutral"
-    length: Literal["short", "medium", "long"] = "medium"
 
 
 class SourceArticle(BaseModel):

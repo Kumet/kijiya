@@ -2,7 +2,7 @@
 
 {% block body %}
 <header class="site-header">
-  <h1>記事屋</h1>
+  <h1>url to article</h1>
   <p class="tagline">記事のURLと指示から、新しい記事を組み直す。</p>
 </header>
 
@@ -12,7 +12,7 @@
         hx-target="#result"
         hx-swap="innerHTML"
         hx-indicator="#indicator"
-        hx-disabled-elt="find button, find input, find select">
+        hx-disabled-elt="find button, find input, find textarea">
     <div class="field">
       <label for="url">記事URL</label>
       <input type="url" id="url" name="url" required placeholder="https://...">
@@ -21,30 +21,13 @@
     <div class="field">
       <label for="prompt">指示</label>
       <textarea id="prompt" name="prompt" required rows="4"
-        placeholder="例: 高校生にもわかるように、専門用語を噛み砕いて解説記事にして"></textarea>
+        placeholder="例: 高校生にもわかるように、専門用語を噛み砕いて解説記事にして。トーンや分量の希望もここに書いてください。"></textarea>
     </div>
-
-    <div class="field">
-      <label for="tone">トーン</label>
-      <select id="tone" name="tone">
-        <option value="neutral">そのまま</option>
-        <option value="casual">くだけた</option>
-        <option value="formal">かたい</option>
-        <option value="explainer">解説調</option>
-      </select>
-    </div>
-
-    <fieldset class="field">
-      <legend>分量</legend>
-      <label><input type="radio" name="length" value="short"> 短め</label>
-      <label><input type="radio" name="length" value="medium" checked> ふつう</label>
-      <label><input type="radio" name="length" value="long"> 長め</label>
-    </fieldset>
 
     <button type="submit">記事を組む</button>
   </form>
 
-  <div id="indicator" class="htmx-indicator">
+  <div id="indicator" class="htmx-indicator" aria-live="polite">
     <div class="loading-bar"></div>
     <p>記事を組んでいます… (30秒ほどかかります)</p>
   </div>

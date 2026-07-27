@@ -45,12 +45,7 @@ async def test_generate_returns_success_fragment(client):
             ):
                 response = await client.post(
                     "/api/generate",
-                    data={
-                        "url": "https://example.com/article",
-                        "prompt": "要約して",
-                        "tone": "neutral",
-                        "length": "short",
-                    },
+                    data={"url": "https://example.com/article", "prompt": "要約して"},
                 )
 
     assert response.status_code == 200
@@ -62,12 +57,7 @@ async def test_generate_returns_success_fragment(client):
 async def test_generate_returns_error_fragment_for_unsafe_url(client):
     response = await client.post(
         "/api/generate",
-        data={
-            "url": "http://127.0.0.1/",
-            "prompt": "要約して",
-            "tone": "neutral",
-            "length": "short",
-        },
+        data={"url": "http://127.0.0.1/", "prompt": "要約して"},
     )
 
     assert response.status_code == 200
