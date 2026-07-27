@@ -37,11 +37,5 @@ def _check_resolves_to_public_address(hostname: str) -> None:
     for info in infos:
         raw_ip = info[4][0].split("%", 1)[0]
         ip = ipaddress.ip_address(raw_ip)
-        if (
-            ip.is_private
-            or ip.is_loopback
-            or ip.is_link_local
-            or ip.is_reserved
-            or ip.is_multicast
-        ):
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
             raise UnsafeUrlError(f"アクセスが許可されていないアドレスです: {ip}")
