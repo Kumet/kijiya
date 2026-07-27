@@ -1,0 +1,134 @@
+:root {
+  --paper: #F7F6F3;
+  --paper-raised: #FFFFFF;
+  --ink: #1A1E29;
+  --ink-mute: #5C6273;
+  --rule: #DCD9D2;
+  --vermilion: #C8341F;
+  --vermilion-soft: #F3E2DE;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.site-header,
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.site-header h1 {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+
+.tagline {
+  color: var(--ink-mute);
+}
+
+.generate-form {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--vermilion);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: 2px solid var(--vermilion);
+  outline-offset: 2px;
+}
+
+button {
+  background: var(--vermilion);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 1.5rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: block;
+}
+
+.loading-bar {
+  height: 3px;
+  background: var(--vermilion);
+  width: 40%;
+  animation: loading-bar-move 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-bar-move {
+  0% { margin-left: 0; }
+  50% { margin-left: 60%; }
+  100% { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar {
+    animation: none;
+  }
+}
+
+.empty-state {
+  color: var(--ink-mute);
+}
+
+@media (max-width: 768px) {
+  .site-header,
+  main {
+    padding: 0 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1A1E29;
+    --paper-raised: #262B38;
+    --ink: #F0EFEC;
+    --ink-mute: #A6ACBD;
+    --rule: #3A4051;
+    --vermilion: #E15A44;
+    --vermilion-soft: #4A2A26;
+  }
+}
