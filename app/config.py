@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    anthropic_api_key: str = ""
-    model: str = "claude-sonnet-5"
+    openai_api_key: str = ""
+    model: str = "gpt-5.6"
     max_tokens: int = 8000
     fetch_timeout: float = 15.0
     max_download_bytes: int = 3_000_000

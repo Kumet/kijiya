@@ -9,7 +9,7 @@
 
 ```bash
 uv sync
-cp .env.example .env   # ANTHROPIC_API_KEY を記入
+cp .env.example .env   # OPENAI_API_KEY を記入
 ```
 
 ## 環境変数
@@ -18,8 +18,8 @@ cp .env.example .env   # ANTHROPIC_API_KEY を記入
 
 | 変数名 | デフォルト | 説明 |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | (必須、記事生成時のみ) | Anthropic APIキー |
-| `MODEL` | `claude-sonnet-5` | 生成に使うモデル |
+| `OPENAI_API_KEY` | (必須、記事生成時のみ) | OpenAI APIキー |
+| `MODEL` | `gpt-5.6` | 生成に使うモデル |
 | `MAX_TOKENS` | `8000` | LLM出力トークン上限 |
 | `FETCH_TIMEOUT` | `15.0` | 記事URL取得タイムアウト(秒) |
 | `MAX_DOWNLOAD_BYTES` | `3000000` | 取得HTMLの上限サイズ(バイト) |
@@ -29,7 +29,7 @@ cp .env.example .env   # ANTHROPIC_API_KEY を記入
 | `ALLOW_PRIVATE_HOSTS` | `False` | `True`でプライベートアドレスへのアクセスを許可 (ローカル検証用) |
 | `RATE_LIMIT_PER_HOUR` | `30` | 同一IPからの生成回数上限 (1時間あたり) |
 
-`ANTHROPIC_API_KEY` はアプリ起動やテストには不要(未設定でも起動・pytestは通る)。
+`OPENAI_API_KEY` はアプリ起動やテストには不要(未設定でも起動・pytestは通る)。
 実際に記事を生成するリクエスト (`POST /api/generate`) を送るときのみ必要。
 
 ## 実行方法

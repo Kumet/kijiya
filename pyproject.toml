@@ -12,7 +12,7 @@ dependencies = [
     "readability-lxml",
     "beautifulsoup4",
     "lxml",
-    "anthropic",
+    "openai",
     "pydantic-settings",
     "charset-normalizer",
 ]

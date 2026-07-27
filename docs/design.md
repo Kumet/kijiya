@@ -40,7 +40,7 @@
 | フロント | htmx 2.x + 素のCSS | CDN読み込み、ビルドツールなし |
 | HTTPクライアント | httpx (async) | |
 | 本文抽出 | trafilatura (主) / readability-lxml + BeautifulSoup (フォールバック) | 日本語記事に強い |
-| LLM | Anthropic Python SDK (`anthropic`) | モデルは環境変数で差し替え可能 |
+| LLM | OpenAI Python SDK (`openai`) | モデルは環境変数で差し替え可能 (実装時点でのデフォルトは `gpt-5.6`) |
 | 設定 | pydantic-settings | |
 | テスト | pytest, pytest-asyncio, respx | |
 | Lint/Format | ruff | |
@@ -55,7 +55,7 @@ trafilatura
 readability-lxml
 beautifulsoup4
 lxml
-anthropic
+openai
 pydantic-settings
 
 [dev]
@@ -149,8 +149,8 @@ kijiya/
 
 | 変数名 | 型 | デフォルト | 説明 |
 |---|---|---|---|
-| `ANTHROPIC_API_KEY` | str | (必須) | APIキー |
-| `MODEL` | str | `claude-sonnet-5` | 生成に使うモデル |
+| `OPENAI_API_KEY` | str | (必須) | APIキー |
+| `MODEL` | str | `gpt-5.6` | 生成に使うモデル |
 | `MAX_TOKENS` | int | `8000` | LLM出力上限 |
 | `FETCH_TIMEOUT` | float | `15.0` | 取得タイムアウト(秒) |
 | `MAX_DOWNLOAD_BYTES` | int | `3_000_000` | 取得HTMLの上限サイズ |
@@ -160,7 +160,7 @@ kijiya/
 | `ALLOW_PRIVATE_HOSTS` | bool | `False` | Trueでプライベートアドレス許可(ローカル検証用) |
 | `RATE_LIMIT_PER_HOUR` | int | `30` | 同一IPからの生成回数上限 |
 
-`.env.example` には `ANTHROPIC_API_KEY=` を含む全項目をコメント付きで記載すること。
+`.env.example` には `OPENAI_API_KEY=` を含む全項目をコメント付きで記載すること。
 
 ---
 
@@ -282,11 +282,11 @@ def extract(html: str, url: str) -> SourceArticle
 async def generate(source: SourceArticle, req: GenerateRequest) -> GeneratedArticle
 ```
 
-- `anthropic.AsyncAnthropic` を使用
+- `openai.AsyncOpenAI` を使用
 - `app/prompts/article.md` をJinja2で読み込みシステムプロンプトを構築
 - ユーザーメッセージに、元記事のメタデータ・本文・ユーザープロンプトを明確なタグで区切って渡す
-- **出力はJSONのみ**を強制。`assistant` の事前入力 (prefill) として `{` を渡し、
-  返ってきたテキストの先頭に `{` を補ってパースする
+- **出力はJSONのみ**を強制。`chat.completions.create` に `response_format={"type": "json_object"}`
+  を指定し、返ってきたテキストをそのままパースする
 - パース失敗時は1回だけリトライ (「JSONのみで再出力せよ」と指示)。2回失敗で `GenerationError`
 - `GeneratedArticle` にバリデーションして返す
 - API側のエラー (認証・レート制限・過負荷) は種類に応じたメッセージの `GenerationError` に変換
@@ -561,7 +561,7 @@ class RateLimitError(KijiyaError): ...
 
 ```bash
 uv sync
-cp .env.example .env   # ANTHROPIC_API_KEY を記入
+cp .env.example .env   # OPENAI_API_KEY を記入
 uv run pytest
 uv run ruff check .
 uv run uvicorn app.main:app --reload --port 8000

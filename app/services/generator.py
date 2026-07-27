@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-import anthropic
+import openai
 from jinja2 import Template
 from pydantic import ValidationError
 
@@ -70,30 +70,29 @@ def _build_user_message(source: SourceArticle, req: GenerateRequest) -> str:
 
 
 def _parse_article(raw_text: str) -> GeneratedArticle:
-    text = raw_text if raw_text.lstrip().startswith("{") else "{" + raw_text
-    data = json.loads(text)
+    data = json.loads(raw_text)
     return GeneratedArticle.model_validate(data)
 
 
-async def _call(client: anthropic.AsyncAnthropic, system_prompt: str, user_content: str) -> str:
-    response = await client.messages.create(
+async def _call(client: openai.AsyncOpenAI, system_prompt: str, user_content: str) -> str:
+    response = await client.chat.completions.create(
         model=settings.model,
-        max_tokens=settings.max_tokens,
-        system=system_prompt,
+        max_completion_tokens=settings.max_tokens,
+        response_format={"type": "json_object"},
         messages=[
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_content},
-            {"role": "assistant", "content": "{"},
         ],
     )
-    return "{" + response.content[0].text
+    return response.choices[0].message.content or ""
 
 
-def _translate_api_error(exc: anthropic.APIError) -> GenerationError:
-    if isinstance(exc, anthropic.AuthenticationError):
+def _translate_api_error(exc: openai.APIError) -> GenerationError:
+    if isinstance(exc, openai.AuthenticationError):
         return GenerationError("APIキーの認証に失敗しました。設定を確認してください。")
-    if isinstance(exc, anthropic.RateLimitError):
+    if isinstance(exc, openai.RateLimitError):
         return GenerationError("APIのレート制限に達しました。時間をおいて試してください。")
-    if isinstance(exc, anthropic.APIStatusError) and exc.status_code == 529:
+    if isinstance(exc, openai.APIStatusError) and exc.status_code == 503:
         return GenerationError("生成サービスが混雑しています。時間をおいて試してください。")
     return GenerationError(
         "記事を生成できませんでした。指示を短くするか、時間をおいて試してください。"
@@ -101,13 +100,13 @@ def _translate_api_error(exc: anthropic.APIError) -> GenerationError:
 
 
 async def generate(source: SourceArticle, req: GenerateRequest) -> GeneratedArticle:
-    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
     system_prompt = _load_system_prompt()
     user_message = _build_user_message(source, req)
 
     try:
         raw = await _call(client, system_prompt, user_message)
-    except anthropic.APIError as exc:
+    except openai.APIError as exc:
         raise _translate_api_error(exc) from exc
 
     try:
@@ -117,7 +116,7 @@ async def generate(source: SourceArticle, req: GenerateRequest) -> GeneratedArti
 
     try:
         raw = await _call(client, system_prompt, user_message + _RETRY_INSTRUCTION)
-    except anthropic.APIError as exc:
+    except openai.APIError as exc:
         raise _translate_api_error(exc) from exc
 
     try:
