@@ -635,6 +635,7 @@ source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
     { name = "beautifulsoup4" },
+    { name = "charset-normalizer" },
     { name = "fastapi", extra = ["standard"] },
     { name = "httpx" },
     { name = "jinja2" },
@@ -656,6 +657,7 @@ dev = [
 requires-dist = [
     { name = "anthropic" },
     { name = "beautifulsoup4" },
+    { name = "charset-normalizer" },
     { name = "fastapi", extras = ["standard"] },
     { name = "httpx" },
     { name = "jinja2" },
